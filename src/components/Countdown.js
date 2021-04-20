@@ -6,15 +6,17 @@ import { fontSize, spacing } from '../utils/sizes';
 const minuteToMs = minute => minute * 60 * 1000;
 const formatTime = time => (time < 10 ? `0${time}` : time);
 
-const Countdown = ({ minutes = 0.1, isPaused, onProgress }) => {
+const Countdown = ({ minutes = 0.1, isPaused, onProgress, onEnd }) => {
   const interval = useRef(null);
-  const [ms, setMs] = useState(minuteToMs(minutes));
+  const [ms, setMs] = useState(null);
   const minute = Math.floor(ms / 1000 / 60) % 60;
   const second = Math.floor(ms / 1000) % 60;
 
   const countDown = () => {
     setMs(time => {
       if (time === 0) {
+        clearInterval(interval.current);
+        onEnd();
         return time;
       }
       const timeLeft = time - 1000;
@@ -22,6 +24,8 @@ const Countdown = ({ minutes = 0.1, isPaused, onProgress }) => {
       return timeLeft;
     });
   };
+
+  useEffect(() => setMs(minuteToMs(minutes)), [minutes]);
 
   useEffect(() => {
     if (isPaused) {
