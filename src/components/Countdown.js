@@ -16,16 +16,20 @@ const Countdown = ({ minutes = 0.1, isPaused, onProgress, onEnd }) => {
     setMs(time => {
       if (time === 0) {
         clearInterval(interval.current);
-        onEnd();
         return time;
       }
       const timeLeft = time - 1000;
-      onProgress(timeLeft / minuteToMs(minutes));
       return timeLeft;
     });
   };
 
   useEffect(() => setMs(minuteToMs(minutes)), [minutes]);
+  useEffect(() => {
+    onProgress(ms / minuteToMs(minutes));
+    if (ms === 0) {
+      onEnd();
+    }
+  }, [ms]);
 
   useEffect(() => {
     if (isPaused) {
